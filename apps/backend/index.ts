@@ -1,4 +1,4 @@
-
+import { fal } from "@fal-ai/client";
 import express from "express";
 import { TrainModel, GenerateImage, GenerateImagesFromPack } from "common/types";
 import { prismaClient } from "db";
@@ -194,19 +194,22 @@ app.get("/models", authMiddleware, async(req, res) => {
 })
 
 app.post("/fal-ai/webhook/train", async (req, res) => {
-  console.log("fal-ai/webhook/train")
-  console.log(JSON.stringify(req.body))
   const requestId = req.body.request_id as string; 
 
   const { imageUrl } = await falAiModel.generateImageSync(req.body.tensor_path)
   
+  const result = await fal.queue.result("fal-ai/flux-lora", {
+    requestId
+  });
+
   await prismaClient.model.updateMany({
     where: {
       falAiRequestId: requestId
     },
     data: {
       trainingStatus: "Generated",
-      tensorPath: req.body.tensor_path,
+      //@ts-ignore
+      tensorPath: result.data.diffusers_lora_file.url,
       thumbnail: imageUrl
     }
   })
