@@ -167,7 +167,10 @@ app.get("/image/bulk", authMiddleware, async (req, res) => {
   const imagesData = await prismaClient.outputImages.findMany({
     where: {
       id: { in: ids }, 
-      userId: req.userId!
+      userId: req.userId!,
+      status: {
+        not: "Failed"
+      }
     },
     skip: parseInt(offset),
     take: parseInt(limit)
@@ -218,6 +221,20 @@ app.post("/fal-ai/webhook/image", async (req, res) => {
   console.log(req.body)
   // update the status of the image in the DB
   const requestId = req.body.request_id;
+
+  if (req.body.status === "ERROR") {
+    res.status(411).json({})
+    prismaClient.outputImages.updateMany({
+      where: {
+        falAiRequestId: requestId
+      },
+      data: {
+        status: "Failed",
+        imageUrl: req.body.payload.images[0].url
+      }
+    })
+    return;
+  }
 
   await prismaClient.outputImages.updateMany({
     where: {
