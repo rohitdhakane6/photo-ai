@@ -180,7 +180,7 @@ app.get("/models", authMiddleware, async(req, res) => {
 
 app.post("/fal-ai/webhook/train", async (req, res) => {
   console.log("fal-ai/webhook/train")
-  console.log(req.body)
+  console.log(JSON.stringify(req.body))
   const requestId = req.body.request_id as string; 
 
   const { imageUrl } = await falAiModel.generateImageSync(req.body.tensor_path)
@@ -213,7 +213,7 @@ app.post("/fal-ai/webhook/image", async (req, res) => {
     },
     data: {
       status: "Generated",
-      imageUrl: req.body.image_url
+      imageUrl: req.body.payload.images[0].url
     }
   })
 
