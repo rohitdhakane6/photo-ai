@@ -24,3 +24,19 @@ export interface SubscriptionStatus {
   createdAt: string;
   credits: number;
 }
+
+export interface PackPrompt {
+  id: string
+  prompt: string
+  imageUrl?: string
+}
+
+export interface Pack {
+  id: string
+  name: string
+  description: string
+  imageUrl1: string
+  imageUrl2: string
+  prompts: PackPrompt[]
+}
+

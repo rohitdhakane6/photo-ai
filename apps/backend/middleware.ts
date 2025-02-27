@@ -6,6 +6,7 @@ declare global {
   namespace Express {
     interface Request {
       userId?: string;
+      role?: "admin" | "user"; 
       user?: {
         email: string;
       };
@@ -74,6 +75,7 @@ export async function authMiddleware(
 
     // Attach the user ID and email to the request
     req.userId = userId;
+
     req.user = {
       email: primaryEmail.emailAddress,
     };
@@ -98,4 +100,13 @@ export async function authMiddleware(
     });
     return;
   }
+}
+
+export async function adminMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  
+  next();
 }
